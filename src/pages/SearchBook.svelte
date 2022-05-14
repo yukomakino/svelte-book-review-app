@@ -4,6 +4,7 @@ import Spinner from '../components/Spinner.svelte';
   import type { BookItem, Result } from '../repositories/book';
   import RepositoryFactory, { BOOK } from '../repositories/RepositoryFactory';
   import BookCard from '../components/BookCard.svelte';
+  import InfiniteScroll from 'svelte-infinite-scroll';
 
   const BookRepository = RepositoryFactory[BOOK];
 
@@ -11,6 +12,10 @@ import Spinner from '../components/Spinner.svelte';
   let empty = false;
   let books: BookItem[] = [];
   let promise: Promise<void>
+  let startIndex = 0;
+  let totalItems = 0;
+
+  $: hasMore = totalItems > books.length;
 
   const handleSubmit = () => {
     if (!q.trim()) return
@@ -20,9 +25,27 @@ import Spinner from '../components/Spinner.svelte';
   const getBooks = async () => {
     books = []
     empty = false
+    startIndex = 0
     const result = await BookRepository.get({ q })
     empty = result.totalItems === 0
+    totalItems = result.totalItems
     books = result.items
+  }
+
+  const handleLoadMore = () => {
+    startIndex +=10
+    promise = getNextPage()
+  }
+
+  const getNextPage = async () => {
+    const result = await BookRepository.get({ q, startIndex })
+
+    // 取得データが既に存在するものを含む可能性があるので、idでフィルタリング。
+    const bookIds = books.map(book => book.id)
+    const filteredItems = result.items.filter(item => {
+      return !bookIds.includes(item.id)
+    })
+    books = [...books, ...filteredItems]
   }
 </script>
 
@@ -39,6 +62,7 @@ import Spinner from '../components/Spinner.svelte';
       <BookCard {book} />
     {/each}
   </div>
+  <InfiniteScroll window on:loadMore={handleLoadMore} />
   {/if}
   {#await promise}
     <div>{book.volumeInfo.title}</div>
