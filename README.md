@@ -1,4 +1,5 @@
-<<<<<<< HEAD
+# svelte-book-review-app
+
 *Looking for a shareable component template? Go here --> [sveltejs/component-template](https://github.com/sveltejs/component-template)*
 
 ---
@@ -103,6 +104,3 @@ Then, from within your project folder:
 npm run build
 surge public my-project.surge.sh
 ```
-=======
-# svelte-book-review-app
->>>>>>> origin/main
