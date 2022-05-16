@@ -62,7 +62,7 @@ import Spinner from '../components/Spinner.svelte';
       <BookCard {book} />
     {/each}
   </div>
-  <InfiniteScroll window on:loadMore={handleLoadMore} />
+  <InfiniteScroll window threshold={100} on:loadMore={handleLoadMore} />
   {/if}
   {#await promise}
     <div>{book.volumeInfo.title}</div>
